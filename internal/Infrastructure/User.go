@@ -8,11 +8,41 @@ import (
 	"gorm.io/gorm"
 )
 
+// Модель для БД
+type UserModel struct {
+	gorm.Model
+	Login    string
+	Password string
+	IsBanned bool
+	Money    int
+}
+
+// Преобразование модели в сущность
+func UserModelToEntity(um *UserModel) *entity.User {
+	return &entity.User{
+		Login:    um.Login,
+		Password: um.Password,
+		IsBanned: um.IsBanned,
+		Money:    um.Money,
+	}
+}
+
+// Преобразование сущности в модель
+func UserEntityToModel(u *entity.User) *UserModel {
+	return &UserModel{
+		Login:    u.Login,
+		Password: u.Password,
+		IsBanned: u.IsBanned,
+		Money:    u.Money,
+	}
+}
+
 // Инфраструктура - Связь репозиториев с БД
 type UserInfrastructure struct {
 	Db *gorm.DB
 }
 
+// Фабрика
 func NewUserInfrastructure(db *gorm.DB) repository.UserRepository {
 	return &UserInfrastructure{
 		Db: db,
@@ -51,33 +81,4 @@ func (ui *UserInfrastructure) Update(u *entity.User) error {
 	modeledUser := UserEntityToModel(u)
 	res := ui.Db.Save(modeledUser)
 	return res.Error
-}
-
-// Преобразование модели в сущность
-func UserModelToEntity(um *UserModel) *entity.User {
-	return &entity.User{
-		Login:    um.Login,
-		Password: um.Password,
-		IsBanned: um.IsBanned,
-		Money:    um.Money,
-	}
-}
-
-// Преобразование сущности в модель
-func UserEntityToModel(u *entity.User) *UserModel {
-	return &UserModel{
-		Login:    u.Login,
-		Password: u.Password,
-		IsBanned: u.IsBanned,
-		Money:    u.Money,
-	}
-}
-
-// Модель для БД
-type UserModel struct {
-	gorm.Model
-	Login    string
-	Password string
-	IsBanned bool
-	Money    int
 }
